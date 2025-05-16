@@ -1,25 +1,27 @@
 import gradio as gr
 import requests
 
-def ask_llm(history, message):
-    history = history or []
-    # POST the question to the Express endpoint
-    response = requests.post(
-        "http://localhost:3000/ask",
-        json={"question": message}
-    )
-    response.raise_for_status()
-    answer = response.json().get("llmResponse", "")
-    history.append((message, answer))
-    return history, ""
+import gradio as gr
+import requests
 
-with gr.Blocks() as demo:
-    gr.Markdown("QA Chatbot")
-    chatbot = gr.Chatbot(label="Chat")
-    msg = gr.Textbox(placeholder="Type your question here...", show_label=False)
-    send = gr.Button("Send")
+def ask_llm(message, history):
+    resp = requests.post("http://localhost:3000/ask", json={"question": message})
+    resp.raise_for_status()
+    answer = resp.json().get("llmResponse", "")
+    yield answer
 
-    send.click(ask_llm, inputs=[chatbot, msg], outputs=[chatbot, msg])
-    msg.submit(ask_llm, inputs=[chatbot, msg], outputs=[chatbot, msg])
+demo = gr.ChatInterface(
+    fn=ask_llm,              # your generator-based handler
+    title="QA Chatbot",
+    examples=[
+        "How many employers are listed for each borrower?",
+        "What are the names of employers listed for each borrower?",
+        "Does the verified employment information match the employer details submitted by the borrowers?"
+    ],
+    theme=gr.themes.Ocean()
+).queue().launch()
 
-demo.launch(share=True)
+# question = "How many employers are listed for each borrower?"
+# question = "What are the names of employers listed for each borrower?"
+# question = "Does the verified employment information match the employer details submitted by the borrowers?"
+# question = "can you explain in more detail"
