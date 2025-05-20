@@ -64,6 +64,16 @@ export const ask_gemini = async (question: string) => {
   return responseText
 }
 
+export const ask_gemini_full = async (question: string) => {
+  const llmResponse = await ai.generate({
+      messages: chatHistory,
+      tools: [getEmployerDetails],
+      prompt: question,
+    });
+  
+  return llmResponse
+}
+
 export const ask_gemini_stream = async (question: string, onToken: (token: string) => void) => {
   const { response, stream } = ai.generateStream({
     messages: chatHistory,

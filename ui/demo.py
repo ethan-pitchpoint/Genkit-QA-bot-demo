@@ -28,14 +28,15 @@ def ask_llm_stream(message, history):
             continue
 
         res = json.loads(raw)
+        print(res)
         if ("event" in res.keys()):
-            yield res["data"]
+            yield full_response
         else:
             full_response += res["data"]
             if (len(full_response) == 0):
                 yield "Thinking..."
             else:
-                yield full_response + "..."
+                yield full_response
 
 demo = gr.ChatInterface(
     # fn=ask_llm,
