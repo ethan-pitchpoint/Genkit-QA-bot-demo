@@ -1,3 +1,8 @@
-import { test_gemini_knowledge } from "./ask_gemini.js";
+import express from 'express'
 
-console.log(await test_gemini_knowledge("What information can you find in a Employer verification?"))
+const app = express()
+app.use(express.json())
+const PORT = process.env.PORT ?? 3000
+app.listen(PORT, () => {
+  console.log(`Server listening on http://localhost:${PORT}`)
+})

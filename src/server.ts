@@ -1,5 +1,5 @@
 import express, { Request, Response, RequestHandler } from 'express'
-import { ask_gemini, ask_gemini_stream } from './ask_gemini.js'
+import { ask_gemini, ask_gemini_stream, ask_gemini_full, ask_gemini_score } from './ask_gemini.js'
 
 const app = express()
 app.use(express.json())
@@ -26,6 +26,51 @@ app.use(express.json())
     
 //   }
 // })
+
+app.post('/ask_full', async (req: Request, res: Response) => {
+  const { question } = req.body as {
+    question: string
+  }
+
+  if (!question) {
+    res.status(400).json({ error: 'Missing "question" in request body' })
+    return
+  }
+
+  try {
+    const llmResponse = await ask_gemini_full(question);
+
+    res.json({ 'data': llmResponse })
+    
+  } catch (err: any) {
+    console.error('Generation error:', err)
+    res.status(500).json({ error: err.message || 'Generation failed' })
+    
+  }
+})
+
+app.post('/score', async (req: Request, res: Response) => {
+  const { gt, pred } = req.body as {
+    gt: string,
+    pred: string
+  }
+
+  if (!gt || !pred) {
+    res.status(400).json({ error: 'Missing "gt" or "pred" in request body' })
+    return
+  }
+
+  try {
+    const llmResponse = await ask_gemini_score(gt, pred);
+
+    res.json({ 'data': llmResponse })
+    
+  } catch (err: any) {
+    console.error('Generation error:', err)
+    res.status(500).json({ error: err.message || 'Generation failed' })
+    
+  }
+})
 
 app.post('/ask', async (req: Request, res: Response) => {
   const { question } = req.body as { question: string }
