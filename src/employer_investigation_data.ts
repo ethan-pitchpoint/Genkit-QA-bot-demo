@@ -1,4 +1,4 @@
-import { EmployerIDInvestigationResultItem } from './schema.js';
+import { EmployerIDInvestigationResultItem } from './employer_investigation_schema.js';
 
 export const EMPLOYER_DATA: Array<EmployerIDInvestigationResultItem> = [{
     "searchInput": {

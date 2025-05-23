@@ -94,6 +94,7 @@ app.post('/ask', async (req: Request, res: Response) => {
     res.end()
 
   } catch (err: any) {
+    console.log(err)
     res.write(JSON.stringify({event: 'error', data: 'Generation failed'}) + '\n')
     res.end()
   }
