@@ -1,4 +1,4 @@
-import { IDInvestigationResultItem } from './ID_investigation_schema.js'
+import { IDInvestigationResultItem } from '../schemas/ID_investigation_schema.js'
 
 export const ID_DATA: Array<IDInvestigationResultItem> = [
         {
