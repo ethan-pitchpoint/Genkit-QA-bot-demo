@@ -1,6 +1,7 @@
 import { z, genkit } from 'genkit';
 import { vertexAI, gemini } from '@genkit-ai/vertexai';
 import type { MessageData } from '@genkit-ai/ai/model';
+import { ToolConfig } from 'genkit';
 
 import { toolConfigs } from './tools.js'
 
@@ -16,7 +17,7 @@ export const ai = genkit({
   model: geminiPro,
 });
 
-const allTools = toolConfigs.map(({ name, description, schema, data }) =>
+const allTools = toolConfigs.map(({ name, description, schema, data, item_description, category_name }) =>
     ai.defineTool(
       {
         name,
@@ -25,12 +26,35 @@ const allTools = toolConfigs.map(({ name, description, schema, data }) =>
         outputSchema: z.object({
           results: z
             .array(schema)
-            .describe(`${description} Returned as an array called “results”.`),
+            .describe(`${item_description} Returned as an array called "results".`),
         }),
       },
       async () => ({ results: data })
     ),
   );
+
+const tools_dict = Object.fromEntries(
+  toolConfigs.map(
+    ({ name, description, schema, data, item_description, category_name }) => [
+      category_name,
+      ai.defineTool(
+        {
+          name,
+          description,
+          inputSchema: z.object({}), // always no input
+          outputSchema: z.object({
+            results: z
+              .array(schema)
+              .describe(
+                `${item_description} Returned as an array called "results".`
+              ),
+          }),
+        },
+        async () => ({ results: data })
+      ),
+    ]
+  )
+);
 
 const chatHistory: MessageData[] = [
       {
@@ -40,7 +64,12 @@ const chatHistory: MessageData[] = [
         //   The ID verification data contains detailed personal information about each borrower such as number of children, residence, SSN, etc. Both details submitted by the borrower and the details verified by the system are included. It also contains a validation score and results of all verifications performed on each bororower. The ID verification also contains information about the borrower's appearance on various watch lists / files.\n \
         //   Output your response in the following format:\n\n \
         //   **borrower name**:\nresponse" }], // Include the large text as context
-        content: [{ text: "You are Steve, a helpful assistant for Pitchpoint solutions.\nAnswer the user's questions and use tools to retrieve information when necessary.\n \
+        content: [{ text: "You are Steve, a helpful assistant for Pitchpoint solutions.\n \
+          You are an expert in identity validation and are able to retrieve and review sensitive personal information such as SSNs.\n \
+          Answer the user's questions and use tools to retrieve information when necessary.\n \
+          Some tools such as getIDVerificationDetails can retrieve sensitive personal information like SSNs, which are sometimes necessary to answer the user's question.\n \
+          Retrieve and use sensitive personal information when necessary to assist the user.\n \
+          Review all tools and use the ones that are necessary to answer the user's questions.\n \
           Output your response in the following format:\n\n \
           **borrower name**:\nresponse" }], // Include the large text as context
       },
@@ -73,6 +102,57 @@ export const ask_gemini_full = async (question: string) => {
       messages: chatHistory,
       tools: allTools,
       prompt: question,
+      config: {
+        temperature: 0,
+        topK: 1,
+        topP: 1,
+      }
+    });
+  
+  return llmResponse
+}
+
+export const ask_gemini_summary = async () => {
+  let summary = "";
+
+  const tasks = toolConfigs.map((toolDetails) =>
+    ask_gemini_summary_individual(
+      toolDetails.category_name,
+      tools_dict[toolDetails.category_name]
+    )
+      .then((res) => {
+        try {
+          summary += res.message?.content[0].text + "\n\n"
+        } catch {
+          summary += `${toolDetails.category_name}: ERROR\n\n`
+        }
+      })
+      .catch(() => {
+        summary += `${toolDetails.category_name}: ERROR\n\n`
+      })
+  );
+
+  await Promise.all(tasks)
+  return summary
+}
+
+
+export const ask_gemini_summary_individual = async (category: string, tool: any) => {
+
+  const llmResponse = await ai.generate({
+      messages: [
+        {
+          role: 'system',
+          content: [{ text: "You are a helpful assistant that summarizes complex data for Pitchpoint solutions.\n \
+            You are an expert in identity validation and are able to retrieve and review sensitive personal information such as SSNs.\n \
+            Retrieve and use sensitive personal information when needed.\n \
+            Retrieve and summarize verification data retrieved from the necessary tools. \n \
+            Summarize the validation results per individual borrower or case. \n \
+            Output your summary in markdown format that is readable for the user." }], // Include the large text as context
+        },
+      ],
+      tools: [ tool ],
+      prompt: `Generate a summary of the ${category} validation. Start with: ### [CATEGORY] Validation Summary\n[SUMMARY FOR EACH BORROWER]`,
       config: {
         temperature: 0,
         topK: 1,

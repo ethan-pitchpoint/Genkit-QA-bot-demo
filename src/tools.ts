@@ -43,6 +43,7 @@ Provides employer-verification data for every borrower.
     schema: EmployerIDInvestigationResultDataSchema,
     data: EMPLOYER_DATA,
     item_description: 'A list of all employer verification results and their corresponding borrowers',
+    category_name: 'employer'
   },
 
   {
@@ -54,28 +55,31 @@ Provides affiliated-business search results that link borrowers to corporations 
     schema: AffiliatedBusinessResultDataSchema,
     data: AFFILIATED_BUSINESS_DATA,
     item_description: 'Full affiliated-business result payloads (one per borrower)',
+    category_name: 'affiliated business'
   },
 
   {
     name: 'getBLJDetails',
     description: `
-Provides detailed Bankruptcy–Judgment–Lien (BLJ) history.
+Provides detailed Bankruptcy-Judgment-Lien (BLJ) history.
 - Content: filter settings (look-back years, hide-released flags), record counts, and full abstracts for bankruptcies, civil judgments, and tax/mechanic liens (case numbers, chapters, courts, plaintiffs, filing + release dates, amounts, status).
 - Use when: the user wants legal encumbrances or public-record risk on a borrower.`,
     schema: DetailedBLJResultDataSchema,
     data: BLJ_DATA,
     item_description: 'Complete BLJ result sets for each borrower',
+    category_name: 'BLJ'
   },
 
   {
     name: 'getFEMADisasterDetails',
     description: `
-Provides FEMA declared-disaster history for the borrower’s geography.
+Provides FEMA declared-disaster history verification for the borrower's geography.
 - Content: disaster number, title, incident begin/end, declaration + close-out dates, disaster + incident types, program declarations (IA, PA, HM), and a convenience list of disasters declared in the last 120 days.
 - Use when: the user asks about natural-disaster or catastrophe exposure.`,
     schema: FEMADeclaredDisastersResultDataSchema,
     data: FEMA_DATA,
     item_description: 'FEMA disaster lookup results',
+    category_name: 'FEMA'
   },
 
   {
@@ -87,6 +91,7 @@ Provides a comprehensive foreclosure investigation that merges bureau SSN valida
     schema: ForeclosureInvestigationResultSchema,
     data: FORCLOSURE_DATA,
     item_description: 'Foreclosure-investigation results',
+    category_name: 'Forclosure'
   },
 
   {
@@ -98,17 +103,19 @@ Provides FHFA Home-Price-Index (HPI) valuations and quarterly history.
     schema: HPIResultDataSchema,
     data: HPI_DATA,
     item_description: 'HPI valuation and index history',
+    category_name: 'HPI'
   },
 
   {
     name: 'getIDVerificationDetails',
     description: `
 Provides full borrower ID-verification (KYC) payloads.
-- Content: supplied PII, overall validation score (1–5) + ranked key drivers, attribute-level pass/fail for name, SSN, DOB, address, phone, compliance checks (OFAC, SSA DMF, dwelling type, land-use, income estimate, children count), and velocity signals (times seen, timestamps).
+- Content: sensitive personal information, supplied PII, overall validation score (1–5) + ranked key drivers, attribute-level pass/fail for name, SSN, DOB, address, phone, compliance checks (OFAC, SSA DMF, dwelling type, land-use, income estimate, children count), and velocity signals (times seen, timestamps).
 - Use when: the user needs identity confidence, fraud screening, or KYC audit detail.`,
     schema: IDInvestigationResultDataSchema,
     data: ID_DATA,
     item_description: 'Detailed ID-verification result sets',
+    category_name: 'Borrower ID'
   },
 
   {
@@ -120,6 +127,7 @@ Provides MERS registry lien information tied to the borrower or property.
     schema: MERSResultDataSchema,
     data: MERS_DATA,
     item_description: 'MERS lien records for each borrower/property',
+    category_name: 'MERS lien'
   },
 
   {
@@ -131,6 +139,7 @@ Provides Mortgage Party List (MPL) compliance-screening results.
     schema: MPLResultDataSchema,
     data: MPL_DATA,
     item_description: 'MPL screening results',
+    category_name: 'MPL screening'
   },
 
   {
@@ -142,6 +151,7 @@ Provides a full property dossier for the collateral address.
     schema: PropertyInvestigationResultDataSchema,
     data: PROPERTY_DATA,
     item_description: 'Property-investigation result sets',
+    category_name: 'Property investigation'
   },
 
   {
@@ -153,6 +163,7 @@ Provides a lightweight SSN verification.
     schema: SSNResultDataSchema,
     data: SSN_DATA,
     item_description: 'SSN verification results',
+    category_name: 'Borrower SSN'
   },
 ];
 

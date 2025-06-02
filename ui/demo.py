@@ -62,3 +62,6 @@ demo = gr.ChatInterface(
 # curl -X POST http://localhost:3000/score \
 #   -H "Content-Type: application/json" \
 #   -d '{"gt":"Does the verified employment information match the employer details submitted by the borrowers?", "pred":"Yes"}'
+
+
+# curl -X POST http://localhost:3000/ask_summary

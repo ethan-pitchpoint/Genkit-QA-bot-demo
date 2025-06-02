@@ -1,5 +1,5 @@
 import express, { Request, Response, RequestHandler } from 'express'
-import { ask_gemini, ask_gemini_stream, ask_gemini_full, ask_gemini_score } from './ask_gemini.js'
+import { ask_gemini, ask_gemini_stream, ask_gemini_full, ask_gemini_score, ask_gemini_summary } from './ask_gemini.js'
 
 const app = express()
 app.use(express.json())
@@ -16,6 +16,20 @@ app.post('/ask_full', async (req: Request, res: Response) => {
 
   try {
     const llmResponse = await ask_gemini_full(question);
+
+    res.json({ 'data': llmResponse })
+    
+  } catch (err: any) {
+    console.error('Generation error:', err)
+    res.status(500).json({ error: err.message || 'Generation failed' })
+    
+  }
+})
+
+app.post('/ask_summary', async (req: Request, res: Response) => {
+
+  try {
+    const llmResponse = await ask_gemini_summary();
 
     res.json({ 'data': llmResponse })
     
